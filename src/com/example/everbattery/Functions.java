@@ -3,15 +3,20 @@ package com.example.everbattery;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 public class Functions {
 	
-	static SharedPreferences settings;
+	private static SharedPreferences settings;
+	private NotificationManager notificationmanager;
 	
 	
 	public void initConnection(Context context){
@@ -121,6 +126,48 @@ public class Functions {
 	    }
 	}
 	   
+	
+	public void initNotification(Context context) {
+		
+        // Open NotificationView Class on Notification Click
+        PendingIntent mIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        //PendingIntent aIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent sIntent =  PendingIntent.getBroadcast(context, 0, new Intent("stopAppService"), PendingIntent.FLAG_UPDATE_CURRENT);
+ 	
+ 
+        //Create Notification using NotificationCompat.Builder 
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                // Set Icon
+                .setSmallIcon(R.drawable.ic_launcher)
+                // Set Ticker Message
+                .setTicker("EverBattery is running...")
+                // Set Title
+                .setContentTitle("EverBattery")
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                // Set Text
+                .setContentText("EverBattery is running. Touch to open.")
+                
+                // Add an Action Button below Notification
+                .addAction(0, "Switch off", sIntent)//replace 0 by R.drawable.btn_off_notif
+                
+                // Set PendingIntent into Notification = MainActiv
+                .setContentIntent(mIntent)
+                // Can't erase the notification
+        		.setOngoing(true)
+        		.setWhen(0);
+ 
+        // Create Notification Manager
+        notificationmanager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+        // Build Notification with Notification Manager
+        notificationmanager.notify(0, builder.build());
+        
+	}
+	
+	public void stopNotification(Context context){
+    	// Cancel notification
+    	notificationmanager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+    	notificationmanager.cancel(0);
+	}
 		
 	   
 		

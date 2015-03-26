@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -28,7 +29,12 @@ public class AppService extends Service {
 	// Filters
 	private IntentFilter intentFilter = null;
 	
+	
+	// Fonctions
+	private Functions f = new Functions();
+	
 	// METHODES
+	
 	public void onCreate() {
 		Log.i("EverBattery", "AppService : onCreate()");
 		
@@ -51,8 +57,14 @@ public class AppService extends Service {
 		wifiReceiver = new WifiReceiver();
 		registerReceiver(wifiReceiver, intentFilter);
 		
+		// - le service se tue lui-même
+		registerReceiver(stopServiceReceiver, new IntentFilter("stopAppService"));
+		
 		// - 
-		// - 
+		
+		
+		// Création de la notification
+        f.initNotification(getApplicationContext());
 	
 	}
 	
@@ -77,11 +89,18 @@ public class AppService extends Service {
     		unregisterReceiver(wifiReceiver);
     		wifiReceiver = null;
     	}
-    	
+    	if (stopServiceReceiver != null) {
+    		unregisterReceiver(stopServiceReceiver);
+    		stopServiceReceiver = null;
+    	}
     	
     	// Destroy OffService
         Intent i = new Intent(getApplicationContext(), OffService.class);
         getApplicationContext().stopService(i);
+        
+        
+        // Destroy notification
+        f.stopNotification(getApplicationContext());
 		 
     	super.onDestroy();
 	}
@@ -91,47 +110,29 @@ public class AppService extends Service {
 		return null;
 	}
 	
-	
-	
-	// FONCTIONS
-	public void initNotification(NotificationManager notificationmanager) {
-        // Open NotificationView Class on Notification Click
-        PendingIntent mIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-        //PendingIntent aIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent sIntent =  PendingIntent.getBroadcast(this, 0, new Intent("stopAppService"), PendingIntent.FLAG_UPDATE_CURRENT);
- 
- 
-        //Create Notification using NotificationCompat.Builder 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                // Set Icon
-                .setSmallIcon(R.drawable.ic_launcher)
-                // Set Ticker Message
-                .setTicker("EverBattery is running...")
-                // Set Title
-                .setContentTitle("EverBattery")
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                // Set Text
-                .setContentText("EverBattery is running. Touch to open.")
-                
-                // Add an Action Button below Notification
-                .addAction(0, "Switch off", sIntent)//replace 0 by R.drawable.btn_off_notif
-                
-                // Set PendingIntent into Notification = MainActiv
-                .setContentIntent(mIntent)
-                // Can't erase the notification
-        		.setOngoing(true)
-        		.setWhen(0);
- 
-        // Create Notification Manager
-        notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // Build Notification with Notification Manager
-        notificationmanager.notify(0, builder.build());
-        
-	}
-	
-	public void stopNotification(NotificationManager notificationmanager){
-    	// Cancel notification
-    	notificationmanager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-    	notificationmanager.cancel(0);
-	}
+	//We need to declare the receiver with onReceive function as below
+	protected BroadcastReceiver stopServiceReceiver = new BroadcastReceiver() {   
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+		
+		  Intent local = new Intent();
+		  local.setAction("stopMainActivity");
+		  sendBroadcast(local);
+			  
+		  stopSelf();
+				  
+		  // on stoppe l'activité
+		  Intent myIntent = new Intent(AppService.this, MainActivity.class);
+		  myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		  
+		  Bundle myKillerBundle = new Bundle();
+		  
+		  myKillerBundle.putInt("kill",1);
+		  
+		  myIntent.putExtras(myKillerBundle);
+		  
+		  getApplication().startActivity(myIntent);
+		  }
+	};
+
 }
