@@ -82,7 +82,7 @@ public class AppService extends Service {
 	
 	
 	// FONCTIONS
-	public void createNotification(NotificationManager notificationmanager) {
+	public void initNotification(NotificationManager notificationmanager) {
         // Open NotificationView Class on Notification Click
         PendingIntent mIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
         //PendingIntent aIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -117,7 +117,7 @@ public class AppService extends Service {
         
 	}
 	
-	public void killNotification(NotificationManager notificationmanager){
+	public void stopNotification(NotificationManager notificationmanager){
     	// Cancel notification
     	notificationmanager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
     	notificationmanager.cancel(0);

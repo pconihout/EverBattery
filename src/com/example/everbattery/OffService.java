@@ -36,8 +36,7 @@ public class OffService extends Service {
 		Log.i("EverBattery", "OffService : onStart()");
 		backsync = new BackgroundSync();
 
-		// On desactive 3G
-		f.setDataEnabled(getApplicationContext(), false);
+		f.stopConnection(getApplicationContext());
 			
 
 		backsync.start();
@@ -53,8 +52,7 @@ public class OffService extends Service {
 			backsync = null;
 		}
     	
-		// On active 3G
-		f.setDataEnabled(getApplicationContext(), true);
+		f.initConnection(getApplicationContext());
 		 
     	super.onDestroy();
 	}
@@ -71,7 +69,7 @@ public class OffService extends Service {
 		private Runnable endsync = new Runnable() { 
 			@Override
 	         public void run() { 
-	        	 f.setDataEnabled(getApplicationContext(), false); 
+				 f.stopConnection(getApplicationContext());
 	        	 Log.i("EverBattery", "OffService - Autosync : Timer finished.");
 	         } 
 	    };
@@ -83,8 +81,7 @@ public class OffService extends Service {
 			    	Log.i("EverBattery", "OffService - Autosync: Timer - 30s");
 				    
 					 
-					// Connecte la data
-					f.setDataEnabled(getApplicationContext(), true); // true pour activer
+			    	f.initConnection(getApplicationContext());
 			
 				    handler.postDelayed(endsync, 1000*20); 
 					

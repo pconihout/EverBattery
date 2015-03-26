@@ -4,10 +4,25 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 public class Functions {
+	
+	static SharedPreferences settings;
+	
+	
+	public void initConnection(Context context){
+		setDataEnabled(context, true);
+		setWifiEnabled(context, true);
+	}
+	
+	public void stopConnection(Context context){
+		setDataEnabled(context, false);
+		setWifiEnabled(context, false);
+	}
 	
 	public Boolean isMobileDataEnabled(Context context){
     Object connectivityService = context.getSystemService(Context.CONNECTIVITY_SERVICE); 
@@ -83,5 +98,32 @@ public class Functions {
 			return false;
 		}
 	 }
+	
+	public void setWifiEnabled(Context context, boolean enabled) {
+    	// On check  si le WiFi était activé avant le lancement de l'appli
+    	boolean wifiEnabled = true;
+    	
+		settings = context.getSharedPreferences("EverBattery", Context.MODE_MULTI_PROCESS);
+    	
+    	// On récupère paramètres
+    	wifiEnabled = settings.getBoolean("wifi_enable", true);
+    	
+    	Log.i("EverBattery", "setWifi : Wifi = " + wifiEnabled);
+	    
+	    if  (wifiEnabled) {
+	    	WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+	    	wifiManager.setWifiEnabled(enabled); // true pour activer
+	    	
+			if (enabled)
+				Log.i("EverBattery", "setWifi: Wifi is enabled");
+			else
+				Log.i("EverBattery", "setWifi : Wifi is disabled");
+	    }
+	}
+	   
 		
+	   
+		
+	
+	
 }
