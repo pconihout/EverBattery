@@ -106,7 +106,7 @@ public class Functions {
 		settings = context.getSharedPreferences("EverBattery", Context.MODE_MULTI_PROCESS);
     	
     	// On récupère paramètres
-    	wifiEnabled = settings.getBoolean("wifi_enable", true);
+    	wifiEnabled = settings.getBoolean("wifi_enabled", true);
     	
     	Log.i("EverBattery", "setWifi : Wifi = " + wifiEnabled);
 	    

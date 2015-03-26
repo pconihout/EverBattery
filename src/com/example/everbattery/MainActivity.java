@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,8 +19,15 @@ import android.os.Build;
 
 public class MainActivity extends Activity {
 
+	// SharedPrefs files
+	private SharedPreferences settings;
+	private SharedPreferences.Editor editor;
+    
 	// Button ON/OFF which launch service
-	ToggleButton launchButton = null;
+	private ToggleButton launchButton = null;
+	
+	// Wi-Fi
+	private WifiManager wifi = null;
 	
 	
 	@Override
@@ -36,7 +45,11 @@ public class MainActivity extends Activity {
 	}
 	
 	public void addListenerOnButton() {
-		 
+        settings = getSharedPreferences("EverBattery", MODE_MULTI_PROCESS);
+        editor = settings.edit();
+        
+        wifi = (WifiManager) getSystemService(getApplicationContext().WIFI_SERVICE);
+        
 		launchButton = (ToggleButton) findViewById(R.id.launchButton);
 	 
 		launchButton.setOnCheckedChangeListener(
@@ -47,6 +60,21 @@ public class MainActivity extends Activity {
 			        if (isChecked) {
 			        	Log.i("EverBattery", "MainActivity : ToggleButton is on."); 
 			        
+	                    // On lance le wifi ?
+	            		if (wifi.isWifiEnabled()) {
+	            			Log.i("SMB-DATA", "MainActivity : Wifi is enabled."); 
+	            		    
+	            	        editor.putBoolean("wifi_enabled", true);
+	            	        
+	            		}
+	            		else {
+	            			Log.i("SMB-DATA", "MainActivity : Wifi is disabled."); 
+	            			editor.putBoolean("wifi_enabled", false);
+	            			
+	            		}
+	            		
+	            		editor.commit();
+	            		
 			        	Intent intentAppService = new Intent(MainActivity.this, AppService.class);
 			        	startService(intentAppService); 
 			        }

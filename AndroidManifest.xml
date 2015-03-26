@@ -43,6 +43,16 @@
 		    </intent-filter>
 		</receiver>
 		
+	   <receiver android:name=".WifiReceiver" 
+	    android:enabled="true"
+	    android:exported="false">
+	    
+		    <intent-filter>
+		        <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+		    </intent-filter>
+		</receiver>
+		
 	   <service android:name=".AppService"/>
 	   <service android:name=".OffService"/>
 	

@@ -12,6 +12,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -33,6 +34,8 @@ public class AppService extends Service {
 		
 		if (screenReceiver != null) 
 			unregisterReceiver(screenReceiver);
+		if (wifiReceiver != null) 
+			unregisterReceiver(screenReceiver);
 		
 		// On créé les Receiver
 		// - screen on/off
@@ -43,6 +46,11 @@ public class AppService extends Service {
 		registerReceiver(screenReceiver, intentFilter);
 		
 		// - wifi activé/desactivé
+		intentFilter = new IntentFilter(WifiManager.EXTRA_WIFI_STATE);
+		
+		wifiReceiver = new WifiReceiver();
+		registerReceiver(wifiReceiver, intentFilter);
+		
 		// - 
 		// - 
 	
@@ -64,6 +72,10 @@ public class AppService extends Service {
     	if (screenReceiver != null) {
     		unregisterReceiver(screenReceiver);
     		screenReceiver = null;
+    	}
+    	if (wifiReceiver != null) {
+    		unregisterReceiver(wifiReceiver);
+    		wifiReceiver = null;
     	}
     	
     	
