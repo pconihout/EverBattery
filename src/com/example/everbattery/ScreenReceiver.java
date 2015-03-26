@@ -19,12 +19,11 @@ public class ScreenReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) { 
 
             Log.i("EverBattery", "ScreenReceiver - Screen turned off");
-            
+           
+  
+            // We launch OffService - 
             Intent i = new Intent(context, OffService.class);
             context.startService(i);
-            
-            
-            // We launch OffService - 
         } 
         
         // L'utilisateur déverouille l'écran
@@ -33,6 +32,8 @@ public class ScreenReceiver extends BroadcastReceiver {
             Log.i("EverBattery", "ScreenReceiver - Screen turned on");
             
             // We stop OffService - 
+            Intent i = new Intent(context, OffService.class);
+            context.stopService(i);
         }
         
 		
