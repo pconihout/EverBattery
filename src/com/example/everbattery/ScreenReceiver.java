@@ -7,14 +7,15 @@ package com.example.everbattery;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.PowerManager;
 import android.util.Log;
 
 public class ScreenReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		
-		
+
 		// L'écran se vérouille
         if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) { 
 

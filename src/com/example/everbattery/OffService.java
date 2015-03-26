@@ -34,12 +34,13 @@ public class OffService extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		Log.i("EverBattery", "OffService : onStart()");
-		backsync = new BackgroundSync();
-
+		
 		f.stopConnection(getApplicationContext());
 			
-
-		backsync.start();
+		if (backsync == null) {
+			backsync = new BackgroundSync();
+			backsync.start();
+		}
 	}
 	
 
