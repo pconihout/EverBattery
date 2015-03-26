@@ -65,6 +65,11 @@ public class AppService extends Service {
     		unregisterReceiver(screenReceiver);
     		screenReceiver = null;
     	}
+    	
+    	
+    	// Destroy OffService
+        Intent i = new Intent(getApplicationContext(), OffService.class);
+        getApplicationContext().stopService(i);
 		 
     	super.onDestroy();
 	}

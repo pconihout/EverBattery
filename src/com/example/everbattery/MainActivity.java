@@ -50,6 +50,13 @@ public class MainActivity extends Activity {
 			        	Intent intentAppService = new Intent(MainActivity.this, AppService.class);
 			        	startService(intentAppService); 
 			        }
+			        else {
+			        	Log.i("EverBattery", "MainActivity : ToggleButton is off"); 
+			        	
+			        	Intent i = new Intent(MainActivity.this, AppService.class);
+			        	MainActivity.this.stopService(i);
+			        }
+			        	
 			    }
 			}
 		);
