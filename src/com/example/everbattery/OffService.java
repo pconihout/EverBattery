@@ -5,11 +5,15 @@
 
 package com.example.everbattery;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -17,9 +21,11 @@ import android.util.Log;
 public class OffService extends Service {
 	
 	// ATTRIBUTS
-	Functions f = new Functions();
+	private Functions f = new Functions();
+	private BackgroundSync backsync = null;
 	
-	// METHODES
+	
+	// METHODE
 	public void onCreate() {
 		
 	
@@ -28,22 +34,27 @@ public class OffService extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		Log.i("EverBattery", "OffService : onStart()");
-		
-		
-		
+		backsync = new BackgroundSync();
+
 		// On desactive 3G
 		f.setDataEnabled(getApplicationContext(), false);
+			
+
+		backsync.start();
 	}
 	
 
 	@Override
 	public void onDestroy() {
 		Log.i("EverBattery", "OffService : onDestroy()");
-		
-		
+    	
+		if (backsync != null) {
+			backsync.interrupt();
+			backsync = null;
+		}
+    	
 		// On active 3G
 		f.setDataEnabled(getApplicationContext(), true);
-		
 		 
     	super.onDestroy();
 	}
@@ -52,5 +63,51 @@ public class OffService extends Service {
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
+
 	
+	public class BackgroundSync extends Thread {
+		Handler handler = new Handler();
+
+		private Runnable autosync = new Runnable() {
+			   @Override
+			   public void run() {
+			    	Log.i("EverBattery", "OffService - Autosync: Timer - 30s");
+				    
+					 
+					// Connecte la data
+					f.setDataEnabled(getApplicationContext(), true); // true pour activer
+					
+					
+				    new Handler().postDelayed(new Runnable() { 
+				         public void run() { 
+				        	 f.setDataEnabled(getApplicationContext(), false); 
+				        	 Log.i("EverBattery", "OffService - Autosync : Timer finished.");
+				         } 
+				    }, 1000*20); 
+					
+					if (handler != null)
+						handler.postDelayed(this, 1000*30*1);
+			   }
+		};
+		
+		@Override
+		public void run(){
+			if (handler == null)
+				handler = new Handler();
+			
+			handler.postDelayed(autosync, 1000*30*1);
+		}
+		
+		@Override
+		public void interrupt() {
+			Log.i("EverBattery", "BackgroundSync - interrupt()");
+			
+			handler.removeCallbacks(autosync);
+			handler = null;
+			
+			super.interrupt();
+		}
+	}
 }
+		
+
