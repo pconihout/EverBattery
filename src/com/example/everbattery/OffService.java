@@ -67,8 +67,17 @@ public class OffService extends Service {
 	
 	public class BackgroundSync extends Thread {
 		Handler handler = new Handler();
-
+		
+		private Runnable endsync = new Runnable() { 
+			@Override
+	         public void run() { 
+	        	 f.setDataEnabled(getApplicationContext(), false); 
+	        	 Log.i("EverBattery", "OffService - Autosync : Timer finished.");
+	         } 
+	    };
+	    
 		private Runnable autosync = new Runnable() {
+			
 			   @Override
 			   public void run() {
 			    	Log.i("EverBattery", "OffService - Autosync: Timer - 30s");
@@ -76,14 +85,8 @@ public class OffService extends Service {
 					 
 					// Connecte la data
 					f.setDataEnabled(getApplicationContext(), true); // true pour activer
-					
-					
-				    new Handler().postDelayed(new Runnable() { 
-				         public void run() { 
-				        	 f.setDataEnabled(getApplicationContext(), false); 
-				        	 Log.i("EverBattery", "OffService - Autosync : Timer finished.");
-				         } 
-				    }, 1000*20); 
+			
+				    handler.postDelayed(endsync, 1000*20); 
 					
 					if (handler != null)
 						handler.postDelayed(this, 1000*30*1);
@@ -102,7 +105,10 @@ public class OffService extends Service {
 		public void interrupt() {
 			Log.i("EverBattery", "BackgroundSync - interrupt()");
 			
+			handler.removeCallbacks(endsync);
 			handler.removeCallbacks(autosync);
+			endsync = null;
+			autosync = null;
 			handler = null;
 			
 			super.interrupt();
