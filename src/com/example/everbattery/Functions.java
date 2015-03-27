@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
@@ -202,6 +204,35 @@ public class Functions {
 	}
 	   
 	
+	public void initNotificationBatteryLow(Context context) {
+		
+        // Open NotificationView Class on Notification Click
+        PendingIntent mIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        //PendingIntent aIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+ 	
+ 
+        //Create Notification using NotificationCompat.Builder 
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                // Set Icon
+                .setSmallIcon(R.drawable.ic_launcher)
+                // Set Ticker Message
+                .setTicker("Nearly out of charge ! Activate EverBattery ?")
+                // Set Title
+                .setContentTitle("EverBattery")
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                // Set Text
+                .setContentText("Touch to launch EverBattery.")
+               
+                // Set PendingIntent into Notification = MainActiv
+                .setContentIntent(mIntent);
+ 
+        // Create Notification Manager
+        notificationmanager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+        // Build Notification with Notification Manager
+        notificationmanager.notify(0, builder.build());
+        
+	}
+	
 	public void initNotification(Context context) {
 		
         // Open NotificationView Class on Notification Click
@@ -221,9 +252,7 @@ public class Functions {
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 // Set Text
                 .setContentText("EverBattery is running. Touch to open.")
-                
-                // Add an Action Button below Notification
-                .addAction(0, "Switch off", sIntent)//replace 0 by R.drawable.btn_off_notif
+            
                 
                 // Set PendingIntent into Notification = MainActiv
                 .setContentIntent(mIntent)
@@ -242,6 +271,17 @@ public class Functions {
     	// Cancel notification
     	notificationmanager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
     	notificationmanager.cancel(0);
+	}
+	
+	
+	public boolean isMyServiceRunning(Context context, Class<?> serviceClass) {
+	    ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if (serviceClass.getName().equals(service.service.getClassName())) {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 		
 	   

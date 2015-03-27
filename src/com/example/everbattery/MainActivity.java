@@ -30,6 +30,9 @@ public class MainActivity extends Activity {
 	// Wi-Fi
 	private WifiManager wifi = null;
 	
+	// Fonctions
+	private Functions f = new Functions();
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,7 @@ public class MainActivity extends Activity {
 			    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 			    	
 			        if (isChecked) {
+			        	
 			        	Log.i("EverBattery", "MainActivity : ToggleButton is on."); 
 			        
 	                    // On lance le wifi ?
@@ -96,6 +100,7 @@ public class MainActivity extends Activity {
 			        	startService(intentAppService); 
 			        }
 			        else {
+			        	
 			        	Log.i("EverBattery", "MainActivity : ToggleButton is off"); 
 			        	
 			        	Intent i = new Intent(MainActivity.this, AppService.class);

@@ -129,7 +129,7 @@ public class AppService extends Service {
         
         // Destroy notification
         f.stopNotification(getApplicationContext());
-		 
+        
     	super.onDestroy();
 	}
 	
