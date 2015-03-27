@@ -14,7 +14,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -38,6 +41,19 @@ public class AppService extends Service {
 	public void onCreate() {
 		Log.i("EverBattery", "AppService : onCreate()");
 		
+		// Receivers in thread
+		/*
+		HandlerThread handlerThread = new HandlerThread("ht");
+		handlerThread.start();
+		Looper looper = handlerThread.getLooper();
+		Handler handler = new Handler(looper);
+		
+		
+		HandlerThread handlerThread_ = new HandlerThread("ht_");
+		handlerThread_.start();
+		Looper looper_ = handlerThread_.getLooper();
+		Handler handler_ = new Handler(looper_);
+		*/
 		if (screenReceiver != null) 
 			unregisterReceiver(screenReceiver);
 		if (wifiReceiver != null) 
@@ -51,9 +67,8 @@ public class AppService extends Service {
 		screenReceiver = new ScreenReceiver();
 		registerReceiver(screenReceiver, intentFilter);
 		
-		// - wifi activé/desactivé
+		// - wifi activé/desactivé manuellement
 		intentFilter = new IntentFilter(WifiManager.EXTRA_WIFI_STATE);
-		
 		wifiReceiver = new WifiReceiver();
 		registerReceiver(wifiReceiver, intentFilter);
 		

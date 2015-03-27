@@ -35,7 +35,8 @@
     
 	   <receiver android:name=".ScreenReceiver" 
 	    android:enabled="true"
-	    android:exported="false">
+	    android:exported="false"
+	    android:process=":screenReceive">
 	    
 		    <intent-filter>
 		        <action android:name="android.intent.action.SCREEN_OFF"/>
@@ -45,7 +46,8 @@
 		
 	   <receiver android:name=".WifiReceiver" 
 	    android:enabled="true"
-	    android:exported="false">
+	    android:exported="false"
+	    android:process=":wifiReceive">
 	    
 		    <intent-filter>
 		        <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
