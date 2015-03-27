@@ -1,10 +1,15 @@
 package com.example.everbattery;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +17,8 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import java.util.UUID;
 
 public class Functions {
 	
@@ -22,14 +29,37 @@ public class Functions {
 	public void initConnection(Context context){
 		setDataEnabled(context, true);
 		setWifiEnabled(context, true);
+		setBluetoothEnabled(context, true);
+		
 	}
 	
 	public void stopConnection(Context context){
 		
-		if (isSharingWiFi(context)) {
+		if (!isSharingWiFi(context)) {
 			setDataEnabled(context, false);
 			setWifiEnabled(context, false);
+			
 		}
+		if (!areBlueDevicesPaired()) {
+			setBluetoothEnabled(context, false);
+		}
+	}
+	
+	public boolean areBlueDevicesPaired() {
+		BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+		
+		if (pairedDevices.size() > 0) {
+            Log.i("EverBattery", "Bluetooth - They are devices paired");
+            		
+        return true;
+		}
+    	else {
+            Log.i("EverBattery", "Bluetooth - No devices connected");
+            
+        return false;
+    	}
+    
 	}
 	
 	public Boolean isMobileDataEnabled(Context context){
@@ -47,6 +77,27 @@ public class Functions {
 	        
 	    return null;
 	    }
+	}
+	
+	public static boolean setBluetoothEnabled(Context context, boolean enable) {
+	    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+	    
+	    boolean isEnabled = bluetoothAdapter.isEnabled();
+	    boolean bluetoothEnabled = settings.getBoolean("bluetooth_enabled", true);
+		settings = context.getSharedPreferences("EverBattery", Context.MODE_MULTI_PROCESS);
+    	
+    	// On récupère paramètres
+    	
+    	if (bluetoothEnabled) {
+		    if (enable && !isEnabled) {
+		        return bluetoothAdapter.enable(); 
+		    }
+		    else if(!enable && isEnabled) {
+		        return bluetoothAdapter.disable();
+		    }
+    	}
+	    // No need to change bluetooth state
+	    return true;
 	}
 	
 	

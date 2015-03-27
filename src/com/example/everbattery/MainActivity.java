@@ -3,6 +3,7 @@ package com.example.everbattery;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
@@ -70,6 +71,22 @@ public class MainActivity extends Activity {
 	            		else {
 	            			Log.i("SMB-DATA", "MainActivity : Wifi is disabled."); 
 	            			editor.putBoolean("wifi_enabled", false);
+	            			
+	            		}
+	            		
+	            		
+	            		// On lance le bluetooth ?
+	            	    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+	            	    
+	            	    if (bluetoothAdapter.isEnabled()) {
+	            			Log.i("SMB-DATA", "MainActivity : Bluetooth is enabled."); 
+	            		    
+	            	        editor.putBoolean("bluetooth_enabled", true);
+	            	        
+	            		}
+	            		else {
+	            			Log.i("SMB-DATA", "MainActivity : Bluetooth is disabled."); 
+	            			editor.putBoolean("bluetooth_enabled", false);
 	            			
 	            		}
 	            		

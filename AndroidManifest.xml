@@ -17,6 +17,7 @@
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
 	<uses-permission android:name="android.permission.BLUETOOTH" />
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
         android:allowBackup="true"
@@ -32,28 +33,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    
-	   <receiver android:name=".ScreenReceiver" 
-	    android:enabled="true"
-	    android:exported="false"
-	    android:process=":screenReceive">
-	    
-		    <intent-filter>
-		        <action android:name="android.intent.action.SCREEN_OFF"/>
-		        <action android:name="android.intent.action.ACTION_USER_PRESENT" />
-		    </intent-filter>
-		</receiver>
-		
-	   <receiver android:name=".WifiReceiver" 
-	    android:enabled="true"
-	    android:exported="false"
-	    android:process=":wifiReceive">
-	    
-		    <intent-filter>
-		        <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-		    </intent-filter>
-		</receiver>
 		
 	   <service android:name=".AppService"/>
 	   <service android:name=".OffService"/>

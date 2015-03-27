@@ -15,7 +15,6 @@ public class WifiReceiver extends BroadcastReceiver {
 		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 		SharedPreferences settings = context.getSharedPreferences("EverBattery", Context.MODE_MULTI_PROCESS);
 		SharedPreferences.Editor editor = settings.edit();
-		boolean wifiStatus = settings.getBoolean("wifi_enabled", true);
 		
 		int state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1);
 		

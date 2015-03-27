@@ -79,15 +79,15 @@ public class OffService extends Service {
 			
 			   @Override
 			   public void run() {
-			    	Log.i("EverBattery", "OffService - Autosync: Timer - 30s");
+			    	Log.i("EverBattery", "OffService - Autosync: Timer - 10mn");
 				    
 					 
 			    	f.initConnection(getApplicationContext());
 			
-				    handler.postDelayed(endsync, 1000*20); 
+				    handler.postDelayed(endsync, 1000*20);//20s 
 					
 					if (handler != null)
-						handler.postDelayed(this, 1000*30*1);
+						handler.postDelayed(this, 1000*60*10);//10mn
 			   }
 		};
 		
@@ -96,7 +96,7 @@ public class OffService extends Service {
 			if (handler == null)
 				handler = new Handler();
 			
-			handler.postDelayed(autosync, 1000*30*1);
+			handler.postDelayed(autosync, 1000*60*10);
 		}
 		
 		@Override

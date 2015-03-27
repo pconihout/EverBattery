@@ -12,7 +12,7 @@ import android.os.PowerManager;
 import android.util.Log;
 
 public class ScreenReceiver extends BroadcastReceiver {
-	boolean wasOn = false;
+	boolean wasOn = true;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -21,13 +21,13 @@ public class ScreenReceiver extends BroadcastReceiver {
         if ((intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) && wasOn) { 
 
             Log.i("EverBattery", "ScreenReceiver - Screen turned off");
+            
+            wasOn = false;
            
   
             // We launch OffService - 
             Intent i = new Intent(context, OffService.class);
             context.startService(i);
-            
-            wasOn = false;
         } 
         
         // L'utilisateur déverouille l'écran

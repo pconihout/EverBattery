@@ -8,6 +8,7 @@ package com.example.everbattery;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,7 @@ public class AppService extends Service {
 	
 	// Receivers
 	private BroadcastReceiver wifiReceiver = null;
+	private BroadcastReceiver blueReceiver = null;
 	private BroadcastReceiver screenReceiver = null;
 	
 	// Filters
@@ -58,19 +60,26 @@ public class AppService extends Service {
 			unregisterReceiver(screenReceiver);
 		if (wifiReceiver != null) 
 			unregisterReceiver(screenReceiver);
+		if (blueReceiver != null) 
+			unregisterReceiver(screenReceiver);
 		
 		// On créé les Receiver
 		// - screen on/off
 		intentFilter = new IntentFilter(Intent.ACTION_USER_PRESENT);
 		intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-		
 		screenReceiver = new ScreenReceiver();
 		registerReceiver(screenReceiver, intentFilter);
 		
+		// - bluetooth activé/desactivé manuellement
+		intentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+		blueReceiver = new BlueReceiver();
+		registerReceiver(blueReceiver, intentFilter);
+		
 		// - wifi activé/desactivé manuellement
-		intentFilter = new IntentFilter(WifiManager.EXTRA_WIFI_STATE);
+		intentFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
 		wifiReceiver = new WifiReceiver();
 		registerReceiver(wifiReceiver, intentFilter);
+		
 		
 		// - le service se tue lui-même
 		registerReceiver(stopServiceReceiver, new IntentFilter("stopAppService"));
@@ -103,6 +112,10 @@ public class AppService extends Service {
     	if (wifiReceiver != null) {
     		unregisterReceiver(wifiReceiver);
     		wifiReceiver = null;
+    	}
+    	if (blueReceiver != null) {
+    		unregisterReceiver(blueReceiver);
+    		blueReceiver = null;
     	}
     	if (stopServiceReceiver != null) {
     		unregisterReceiver(stopServiceReceiver);
