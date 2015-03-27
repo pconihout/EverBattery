@@ -25,8 +25,11 @@ public class Functions {
 	}
 	
 	public void stopConnection(Context context){
-		setDataEnabled(context, false);
-		setWifiEnabled(context, false);
+		
+		if (isSharingWiFi(context)) {
+			setDataEnabled(context, false);
+			setWifiEnabled(context, false);
+		}
 	}
 	
 	public Boolean isMobileDataEnabled(Context context){
@@ -103,6 +106,27 @@ public class Functions {
 			return false;
 		}
 	 }
+	
+	public static boolean isSharingWiFi(Context context)
+	{
+		WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		
+	    try
+	    {
+	    	
+	        Method method = manager.getClass().getDeclaredMethod("isWifiApEnabled");
+	        method.setAccessible(true); //in the case of visibility change in future APIs
+	        
+	        Log.i("EverBattery", "isSharingWifi() = " + method.invoke(manager));
+	        
+	        return (Boolean) method.invoke(manager);
+	    }
+	    catch (final Throwable ignored)
+	    {
+	    }
+
+	    return false;
+	}
 	
 	public void setWifiEnabled(Context context, boolean enabled) {
     	// On check  si le WiFi était activé avant le lancement de l'appli
