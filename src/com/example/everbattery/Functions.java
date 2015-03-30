@@ -252,7 +252,9 @@ public class Functions {
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 // Set Text
                 .setContentText("EverBattery is running. Touch to open.")
-            
+                
+                // Add an Action Button below Notification
+                .addAction(0, "Switch off", sIntent)//replace 0 by R.drawable.btn_off_notif
                 
                 // Set PendingIntent into Notification = MainActiv
                 .setContentIntent(mIntent)

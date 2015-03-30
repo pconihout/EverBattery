@@ -55,6 +55,10 @@ public class MainActivity extends Activity {
         wifi = (WifiManager) getSystemService(getApplicationContext().WIFI_SERVICE);
         
 		launchButton = (ToggleButton) findViewById(R.id.launchButton);
+		
+		if (f.isMyServiceRunning(getApplicationContext(), AppService.class))
+			launchButton.setChecked(true);
+		
 	 
 		launchButton.setOnCheckedChangeListener(
 				
