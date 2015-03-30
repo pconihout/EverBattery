@@ -29,6 +29,7 @@ public class AppService extends Service {
 	// Receivers
 	private BroadcastReceiver wifiReceiver = null;
 	private BroadcastReceiver blueReceiver = null;
+	private BroadcastReceiver callReceiver = null;
 	private BroadcastReceiver screenReceiver = null;
 	
 	// Filters
@@ -59,9 +60,11 @@ public class AppService extends Service {
 		if (screenReceiver != null) 
 			unregisterReceiver(screenReceiver);
 		if (wifiReceiver != null) 
-			unregisterReceiver(screenReceiver);
+			unregisterReceiver(wifiReceiver);
 		if (blueReceiver != null) 
-			unregisterReceiver(screenReceiver);
+			unregisterReceiver(blueReceiver);
+		if (callReceiver != null) 
+			unregisterReceiver(callReceiver);
 		
 		// On créé les Receiver
 		// - screen on/off
@@ -84,7 +87,10 @@ public class AppService extends Service {
 		// - le service se tue lui-même
 		registerReceiver(stopServiceReceiver, new IntentFilter("stopAppService"));
 		
-		// - 
+		// - l'utilisateur répond au téléphone
+		intentFilter = new IntentFilter("android.intent.action.PHONE_STATE");
+		callReceiver = new CallReceiver();
+		registerReceiver(callReceiver, intentFilter);
 		
 		
 		// Création de la notification
@@ -116,6 +122,10 @@ public class AppService extends Service {
     	if (blueReceiver != null) {
     		unregisterReceiver(blueReceiver);
     		blueReceiver = null;
+    	}
+    	if (callReceiver != null) {
+    		unregisterReceiver(callReceiver);
+    		callReceiver = null;
     	}
     	if (stopServiceReceiver != null) {
     		unregisterReceiver(stopServiceReceiver);
