@@ -12,37 +12,43 @@ import android.os.PowerManager;
 import android.util.Log;
 
 public class ScreenReceiver extends BroadcastReceiver {
-	boolean wasOn = true;
-
+	private boolean wasOn = true;
+	private SharedPreferences settings;
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-
-		// L'écran se vérouille
-        if ((intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) && wasOn) { 
-
-            Log.i("EverBattery", "ScreenReceiver - Screen turned off");
-            
-            wasOn = false;
-           
-  
-            // We launch OffService - 
-            Intent i = new Intent(context, OffService.class);
-            context.startService(i);
-        } 
-        
-        // L'utilisateur déverouille l'écran
-        else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)){ 
-            
-            Log.i("EverBattery", "ScreenReceiver - Screen turned on");
-            
-            wasOn = true;
-            
-            // We stop OffService - 
-            Intent i = new Intent(context, OffService.class);
-            context.stopService(i);
-        }
-        
 		
+		SharedPreferences settings = context.getSharedPreferences("EverBattery", Context.MODE_MULTI_PROCESS);
+
+		// On veut que screen fonctionne
+		if (settings.getBoolean("appservice_enabled", true)){
+			// L'écran se vérouille
+	        if ((intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) && wasOn) { 
+	
+	            Log.i("EverBattery", "ScreenReceiver - Screen turned off");
+	            
+	            wasOn = false;
+	           
+	  
+	            // We launch OffService - 
+	            Intent i = new Intent(context, OffService.class);
+	            context.startService(i);
+	        } 
+	        
+	        // L'utilisateur déverouille l'écran
+	        else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)){ 
+	            
+	            Log.i("EverBattery", "ScreenReceiver - Screen turned on");
+	            
+	            wasOn = true;
+	            
+	            // We stop OffService - 
+	            Intent i = new Intent(context, OffService.class);
+	            context.stopService(i);
+	        }
+	        
+			
+		}
 	}
 
 }
