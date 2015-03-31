@@ -220,7 +220,7 @@ public class Functions {
         //Create Notification using NotificationCompat.Builder 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 // Set Icon
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setSmallIcon(R.drawable.ic_ebattery_notificonwhite)
                 // Set Ticker Message
                 .setTicker("Nearly out of charge ! Activate EverBattery ?")
                 // Set Title
@@ -250,7 +250,7 @@ public class Functions {
         //Create Notification using NotificationCompat.Builder 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 // Set Icon
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setSmallIcon(R.drawable.ic_ebattery_notificonwhite)
                 // Set Ticker Message
                 .setTicker("EverBattery is running...")
                 // Set Title
@@ -260,7 +260,7 @@ public class Functions {
                 .setContentText("EverBattery is running. Touch to open.")
                 
                 // Add an Action Button below Notification
-                .addAction(0, "Switch off", sIntent)//replace 0 by R.drawable.btn_off_notif
+                .addAction(R.drawable.btn_off_notif, "Switch off", sIntent)//replace 0 by R.drawable.btn_off_notif
                 
                 // Set PendingIntent into Notification = MainActiv
                 .setContentIntent(mIntent)

@@ -10,6 +10,9 @@
         android:id="@+id/launchButton"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/launchButton" />
+        android:text="@string/launchButton" 
+        android:background="@layout/checkbutton"
+        android:textOn=""
+        android:textOff=""/>
 
 </FrameLayout>

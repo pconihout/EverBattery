@@ -33,18 +33,24 @@ public class MainActivity extends Activity {
 	// Fonctions
 	private Functions f = new Functions();
 	
+	// Animations
+	//final Animation animScale = AnimationUtils.loadAnimation(this, R.anim.anim_scale);
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.main_layout);
 
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}
 		
+		getActionBar().setTitle("   EverBattery");
+		getActionBar().setIcon(R.drawable.ic_ebattery_notificon);
+		
 		addListenerOnButton();
+		
 		
 	}
 	
