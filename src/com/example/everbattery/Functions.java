@@ -12,11 +12,13 @@ import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -32,6 +34,10 @@ public class Functions {
 		setDataEnabled(context, true);
 		setWifiEnabled(context, true);
 		setBluetoothEnabled(context, true);
+		
+		Bundle extras = new Bundle();
+		extras.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
+		context.getContentResolver().startSync(null, extras);
 		
 	}
 	
