@@ -18,19 +18,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.UUID;
 
+import com.example.everbattery.AppService.Logging;
+
 public class Functions {
 	
 	private static SharedPreferences settings;
 	private NotificationManager notificationmanager;
-	
+	Logger l = null;
+	SendLog sendlog = null;  
 	
 	public void initConnection(Context context){
+		
+		
 		setDataEnabled(context, true);
 		setWifiEnabled(context, true);
 		setBluetoothEnabled(context, true);
@@ -39,6 +46,13 @@ public class Functions {
 		extras.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
 		context.getContentResolver().startSync(null, extras);
 		
+		l = (Logger) context.getApplicationContext();
+		
+		if (sendlog == null) {
+			//Log.i("EverBattery", "sendlog = null");
+			sendlog = new SendLog();
+			sendlog.start();
+		}
 	}
 	
 	public void stopConnection(Context context){
@@ -51,6 +65,12 @@ public class Functions {
 		if (!areBlueDevicesPaired()) {
 			setBluetoothEnabled(context, false);
 		}
+		
+    	// 	Logging Thread
+    	if (sendlog != null) {
+    		sendlog.interrupt();
+			sendlog = null;
+    	}
 	}
 	
 	public boolean areBlueDevicesPaired() {
@@ -292,8 +312,82 @@ public class Functions {
 	    return false;
 	}
 		
-	   
-		
 	
+	public String getDeviceName() {
+	    String manufacturer = Build.MANUFACTURER;
+	    String model = Build.MODEL;
+	    if (model.startsWith(manufacturer)) {
+	        return capitalize(model);
+	    } else {
+	        return capitalize(manufacturer) + " " + model;
+	    }
+	}
+
+
+	public String capitalize(String s) {
+	    if (s == null || s.length() == 0) {
+	        return "";
+	    }
+	    char first = s.charAt(0);
+	    if (Character.isUpperCase(first)) {
+	        return s;
+	    } else {
+	        return Character.toUpperCase(first) + s.substring(1);
+	    }
+	} 
+	   
+	
+	public class SendLog extends Thread {
+		private Handler handler = new Handler();
+		
+	    
+		private Runnable senddata = new Runnable() {
+			
+		   @Override
+		   public void run() {
+			   
+			   if (l != null) {
+			    	do {
+						try {
+						Thread.sleep(800);
+    
+						} 
+						catch(InterruptedException ex) {
+						    Thread.currentThread().interrupt();
+						}
+						catch(IllegalStateException ex) {
+			    		    Thread.currentThread().interrupt();
+			         	}
+	
+						Log.i("EverBattery", "SendLog - Sending data.");
+						
+					} while(l.pilePleine() && l.sendIt());
+			   }
+			   else 
+				   Log.i("EverBattery", "SendLog - l = null");
+		   }
+		};
+			
+		@Override
+		public void run(){
+			
+			if (handler == null)
+				handler = new Handler();
+			
+			handler.postDelayed(senddata, 1000*3);
+				
+		}
+		
+		@Override
+		public void interrupt() {
+			Log.i("EverBattery", "SendLog - interrupt()");
+			
+			handler.removeCallbacks(senddata);
+			senddata = null;
+			handler = null;
+			
+			super.interrupt();
+		}
+	}
 	
 }

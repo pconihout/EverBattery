@@ -4,6 +4,8 @@
 
 package com.example.everbattery;
 
+import com.google.gson.Gson;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +17,11 @@ public class ScreenReceiver extends BroadcastReceiver {
 	private boolean wasOn = true;
 	private SharedPreferences settings;
 	
+	
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		
 		
 		SharedPreferences settings = context.getSharedPreferences("EverBattery", Context.MODE_MULTI_PROCESS);
 

@@ -54,6 +54,7 @@ public class OffService extends Service {
 		}
     	
 		f.initConnection(getApplicationContext());
+
 		 
     	super.onDestroy();
 	}

@@ -13,6 +13,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +37,10 @@ public class AppService extends Service {
 	// Filters
 	private IntentFilter intentFilter = null;
 	
+
+	// Logger
+	Logger l = null;
+	private Logging logging = null;
 	
 	// Fonctions
 	private Functions f = new Functions();
@@ -43,6 +49,9 @@ public class AppService extends Service {
 	
 	public void onCreate() {
 		Log.i("EverBattery", "AppService : onCreate()");
+		
+		l = (Logger) getApplicationContext();
+		
 		
 		// Receivers in thread
 		/*
@@ -102,7 +111,13 @@ public class AppService extends Service {
 	public void onStart(Intent intent, int startId) {
 		Log.i("EverBattery", "AppService : onStart()");
 		
-
+		if (logging == null) {
+			logging = new Logging();
+			
+	    	// Commit logging to ScreenReceiver
+	        
+			logging.start();
+		}
 	}
 	
 
@@ -131,6 +146,15 @@ public class AppService extends Service {
     		unregisterReceiver(stopServiceReceiver);
     		stopServiceReceiver = null;
     	}
+    	
+    	// 	Logging Thread
+    	if (logging != null) {
+    		logging.interrupt();
+			logging = null;
+    	}
+    	
+    	
+   
     	
     	// Destroy OffService
         Intent i = new Intent(getApplicationContext(), OffService.class);
@@ -172,5 +196,41 @@ public class AppService extends Service {
 		  getApplication().startActivity(myIntent);
 		  }
 	};
+	
+	public class Logging extends Thread {
+		private Handler handler = new Handler();
+	    
+		private Runnable logging = new Runnable() {
+			
+			   @Override
+			   public void run() {
+			    	Log.i("EverBattery", "LogThread - Logging");
+				    
+					l.logIt(getApplicationContext());
+					
+					if (handler != null)
+						handler.postDelayed(this, 1000*60*1);//5mn
+			   }
+		};
+		
+		@Override
+		public void run(){
+			if (handler == null)
+				handler = new Handler();
+			
+			handler.postDelayed(logging, 0);
+		}
+		
+		@Override
+		public void interrupt() {
+			Log.i("EverBattery", "LogThread - interrupt()");
+			
+			handler.removeCallbacks(logging);
+			logging = null;
+			handler = null;
+			
+			super.interrupt();
+		}
+	}
 
 }
