@@ -207,6 +207,7 @@ public class AppService extends Service {
 			    	Log.i("EverBattery", "LogThread - Logging");
 				    
 					l.logIt(getApplicationContext());
+					l.sendIt();
 					
 					if (handler != null)
 						handler.postDelayed(this, 1000*60*1);//5mn

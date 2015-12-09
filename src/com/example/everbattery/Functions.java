@@ -1,6 +1,7 @@
 package com.example.everbattery;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -22,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import java.util.UUID;
@@ -131,60 +133,107 @@ public class Functions {
 	
 	
 	public boolean setDataEnabled(Context context, boolean enabled){
-	Class<?> conmanClass = null;
-	Field connectivityManagerField = null;
-	Object connectivityManager = null;
-	Class<?> connectivityManagerClass = null;
-	Method setMobileDataEnabledMethod = null;
-
-		final ConnectivityManager conman = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		try {
-			conmanClass = Class.forName(conman.getClass().getName());
-		} catch (Exception e) {
-		}
-		try {
-			connectivityManagerField = conmanClass.getDeclaredField("mService");
-		} catch (Exception e) {
-		}
-		connectivityManagerField.setAccessible(true);
-		try {
-			connectivityManager = connectivityManagerField.get(conman);
-		} catch (Exception e) {
-		}
-		try {
-			connectivityManagerClass = Class.forName(connectivityManager
-					.getClass().getName());
-		} catch (Exception e) {
-		}
-		try {
-			setMobileDataEnabledMethod = connectivityManagerClass
-					.getDeclaredMethod("setMobileDataEnabled", Boolean.TYPE);
-		} catch (Exception e) {
-		}
-
-		try {
-			// Verif si 3G desactiv & qu'on veut activ
-			if (!isMobileDataEnabled(context) && enabled) {
-				setMobileDataEnabledMethod.invoke(connectivityManager, enabled);
-				Log.i("EverBattery", "setMobileData : Data is enabled");
+	
+	
+	if (android.os.Build.VERSION.SDK_INT < 21){
+		
+		Log.i("EverBattery", "setMobileData : NOT LOLLIPOP");
+		
+		Class<?> conmanClass = null;
+		Field connectivityManagerField = null;
+		Object connectivityManager = null;
+		Class<?> connectivityManagerClass = null;
+		Method setMobileDataEnabledMethod = null;
+	
+			final ConnectivityManager conman = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+			try {
+				conmanClass = Class.forName(conman.getClass().getName());
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			// 3G activ && on veut desact
-			else if (isMobileDataEnabled(context) && !enabled) {
-				setMobileDataEnabledMethod.invoke(connectivityManager, enabled);
-				Log.i("EverBattery", "setMobileData : Data is disabled");
+			try {
+				connectivityManagerField = conmanClass.getDeclaredField("mService");
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			else
-				Log.i("EverBattery", "setMobileData : No operations on data");
+			connectivityManagerField.setAccessible(true);
+			try {
+				connectivityManager = connectivityManagerField.get(conman);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				connectivityManagerClass = Class.forName(connectivityManager
+						.getClass().getName());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				setMobileDataEnabledMethod = connectivityManagerClass
+						.getDeclaredMethod("setMobileDataEnabled", boolean.class);
+				setMobileDataEnabledMethod.setAccessible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	
+			try {
+				// Verif si 3G desactiv & qu'on veut activ
+				if (!isMobileDataEnabled(context) && enabled) {
+					setMobileDataEnabledMethod.invoke(connectivityManager, enabled);
+					Log.i("EverBattery", "setMobileData : Data is enabled");
+				}
+				// 3G activ && on veut desact
+				else if (isMobileDataEnabled(context) && !enabled) {
+					setMobileDataEnabledMethod.invoke(connectivityManager, enabled);
+					Log.i("EverBattery", "setMobileData : Data is disabled");
+				}
+				else
+					Log.i("EverBattery", "setMobileData : No operations on data");
+				
+				
+				return true; 
+				
+			} 
+			catch (Exception e) {
+	
+				return false;
+			}
 			
-			
-			return true; 
-			
-		} 
-		catch (Exception e) {
-
-			return false;
 		}
-	 }
+		
+		
+		// IF 5.x
+		else { 
+			
+			Log.i("EverBattery", "setMobileData : LOLLIPOP");
+			
+		    try
+		    {
+		        TelephonyManager telephonyService = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+		        Method setMobileDataEnabledMethod = telephonyService.getClass().getDeclaredMethod("setDataEnabled", boolean.class);
+
+		        if (null != setMobileDataEnabledMethod)
+		        {
+		            setMobileDataEnabledMethod.invoke(telephonyService, enabled);
+		            Log.e("EverBattery", "no err - data is enabled/dis");
+		           
+		        }
+		        
+		        return true;
+		    }
+		    catch (Exception ex)
+		    {
+		        Log.e("EverBattery", "Error setting mobile data state", ex);
+		        
+		        return false;
+		    }
+		}
+	
+	}
+
+
+	
 	
 	public static boolean isSharingWiFi(Context context)
 	{
@@ -335,7 +384,44 @@ public class Functions {
 	        return Character.toUpperCase(first) + s.substring(1);
 	    }
 	} 
-	   
+	  
+	
+	
+	public String readCPUcurrent() {
+		String cpuFreq = "";
+		try {
+	    RandomAccessFile reader = new RandomAccessFile("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq", "r");
+	    cpuFreq = reader.readLine();
+	    reader.close();
+		}
+		catch (IOException e) { e.printStackTrace(); }
+	    
+	    
+	    return cpuFreq;
+	} 
+	
+	public String readCPUmax() {
+		String cpuFreq = "";
+		try {
+	    RandomAccessFile reader = new RandomAccessFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", "r");
+	    cpuFreq = reader.readLine();
+	    reader.close();
+		}
+		catch (IOException e) { e.printStackTrace(); }
+	    
+	    
+	    return cpuFreq;
+	} 
+	
+	public float getCPUfreq() {
+
+	    float cpuFreq = 100*(Float.parseFloat(readCPUcurrent()) / Float.parseFloat(readCPUmax()));
+	    
+	    return cpuFreq;
+	} 
+	
+	
+	
 	
 	public class SendLog extends Thread {
 		private Handler handler = new Handler();
@@ -361,7 +447,7 @@ public class Functions {
 	
 						Log.i("EverBattery", "SendLog - Sending data.");
 						
-					} while(l.pilePleine() && l.sendIt());
+					} while(l.pilePleine());
 			   }
 			   else 
 				   Log.i("EverBattery", "SendLog - l = null");
@@ -388,6 +474,7 @@ public class Functions {
 			
 			super.interrupt();
 		}
+		
 	}
 	
 }

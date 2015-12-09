@@ -85,7 +85,7 @@ public class OffService extends Service {
 					 
 			    	f.initConnection(getApplicationContext());
 			
-				    handler.postDelayed(endsync, 1000*20);//20s 
+				    handler.postDelayed(endsync, 1000*30);//30s 
 					
 					if (handler != null)
 						handler.postDelayed(this, 1000*60*10);//10mn

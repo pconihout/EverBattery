@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Stack;
 
 import org.apache.http.client.ClientProtocolException;
@@ -16,6 +17,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.MemoryInfo;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -81,9 +86,14 @@ public class Logger extends Application {
 		
 		
 		// DATE & TIME
-	    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());//dd/MM/yyyy
+	    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());//dd/MM/yyyy
 	    Date now = new Date();
 	    String strDate = sdfDate.format(now);
+	    
+	    
+	    SimpleDateFormat sdfHour = new SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault());
+	    now = new Date();
+	    String strHour = sdfHour.format(now);
 	    
 	    // MODEL
 	    String model = f.getDeviceName();
@@ -141,19 +151,55 @@ public class Logger extends Application {
 	    //NfcManager manager = (NfcManager) context.getSystemService(Context.NFC_SERVICE);
 	    //NfcAdapter nfc = manager.getDefaultAdapter();
 	    
+	    // MEM
+	    MemoryInfo mi = new MemoryInfo();
+	    ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+	    activityManager.getMemoryInfo(mi);
+	    long availableMegs = mi.availMem / 1048576L;
+	    
+	    
+	    //long totalMegs = mi.totalMem / 1048576L;
+	    
+	    
+	    // RUNNING APPS
+	    String appsList = new String("");
+	    
+	    ActivityManager activitManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+	    List<RunningTaskInfo> tasks = activitManager.getRunningTasks(Integer.MAX_VALUE);
+
+	    for (int i = 0; i < tasks.size(); i++) {
+	    	appsList = appsList + "\n" + tasks.get(i).baseActivity.toShortString();
+	        //Log.d("Running task", "Running task: " + tasks.get(i).baseActivity.toShortString() + "\t\t ID: " + tasks.get(i).id);
+	        //Log.d("Running task", "yoyo : " + appsList);
+	    }
 	    
 		try {
 			object.put("IMEI", imei); // done  
 			object.put("DATE", strDate); // done
+			object.put("TIME", strHour); // done
+			
 			object.put("MODEL", model); // done
+			object.put("VERSION_ANDROID", android.os.Build.VERSION.RELEASE);
+			
 			object.put("COUNTRY", country); // done
+			
 			object.put("BATT_VAL", batteryLevel); // done
 			object.put("CHARGE_ON", isCharging); // done
+			
 			object.put("SCREEN_ON", powerManager.isScreenOn()); // done
 			object.put("DATA_ON", mobileDataEnabled); // done
 			object.put("WIFI_ON", wifi.isWifiEnabled()); // done
 			object.put("BLUETOOTH_ON", blue.isEnabled()); // done
 			object.put("NFC_ON", "");// nfc.isEnabled()); //
+			
+			object.put("CPU", f.getCPUfreq());
+			
+			//object.put("MEM_TOTAL", f.readCPUusage());
+			object.put("MEM_AVAILABLE", availableMegs);
+			object.put("MEM_LOW", mi.lowMemory);
+			
+			object.put("RUNNING_APPS", appsList);
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
